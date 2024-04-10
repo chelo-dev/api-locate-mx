@@ -96,5 +96,5 @@ Para interactuar con la API, asegúrese de establecer adecuadamente los siguient
 Esta documentación está diseñada para ayudarlo a comprender y utilizar la API Codigos Postales MX de manera efectiva. Siéntase libre de explorar las diversas solicitudes y endpoints disponibles para aprovechar al máximo esta rica fuente de datos geográficos.
 ## Desarrollado por
 
-- [@chelitodelgado](https://github.com/chelitodelgado)
+- [@chelo-dev](https://github.com/chelo-dev)
 

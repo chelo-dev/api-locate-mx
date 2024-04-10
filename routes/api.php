@@ -20,9 +20,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 # API Codigos Postales
-Route::get('/ubicacion-por-codigo-postal/{codigo_postal}', [ApiController::class, 'ubicacionPorCodigoPostal'])->name('obtener_codigos_postales_municipios');
-Route::get('/codigos-postales/{paginacion?}', [ApiController::class, 'codigosPostales'])->name('codigos_postales');
-Route::get('/colonia/{colonia}', [ApiController::class, 'colonia'])->name('colonia');
-Route::get('/colonias/{paginacion?}', [ApiController::class, 'colonias'])->name('colonias');
-Route::get('/estado/{estado}', [ApiController::class, 'estado'])->name('estado');
-Route::get('/estados/{paginacion?}', [ApiController::class, 'estados'])->name('estados');
+Route::prefix('mx/')->group(function () {
+    Route::get('ubicacion-por-codigo-postal/{codigo_postal}', [ApiController::class, 'ubicacionPorCodigoPostal'])->name('obtener_codigos_postales_municipios');
+    Route::get('codigos-postales/{paginacion?}', [ApiController::class, 'codigosPostales'])->name('codigos_postales');
+    Route::get('colonia/{colonia}', [ApiController::class, 'colonia'])->name('colonia');
+    Route::get('colonias/{paginacion?}', [ApiController::class, 'colonias'])->name('colonias');
+    Route::get('estado/{estado}', [ApiController::class, 'estado'])->name('estado');
+    Route::get('estados/{paginacion?}', [ApiController::class, 'estados'])->name('estados');
+});

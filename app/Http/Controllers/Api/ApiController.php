@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\BaseController;
 use App\Helpers\SharedFunctionsHelpers;
 use App\Models\Codigo_Postal_Municipio;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 use App\Models\Codigo_Postal;
 use Illuminate\Http\Request;
@@ -12,7 +12,7 @@ use App\Models\Estado_Pais;
 use App\Models\Colonia;
 use Exception;
 
-class ApiController extends BaseController
+class ApiController extends Controller
 {
     protected $shared;
 
@@ -74,9 +74,13 @@ class ApiController extends BaseController
     public function estado($estado)
     {
         try {
-            $estado = Estado_Pais::where('nombre', $estado)->firstOrFail();
+            $estado = strtolower($estado);
 
-            return $this->shared->sendResponse($estado, $this->shared->getDataMessage(), Response::HTTP_OK);
+            $estadoEncontrado = Estado_Pais::whereRaw("LOWER(nombre) LIKE ?", ['%' . $estado . '%'])
+                ->orWhereRaw("MATCH(nombre) AGAINST(? IN NATURAL LANGUAGE MODE)", [$estado])
+                ->firstOrFail(['id', 'nombre']);
+
+            return $this->shared->sendResponse($estadoEncontrado, $this->shared->getDataMessage(), Response::HTTP_OK);
         } catch (Exception $error) {
             return $this->shared->sendError($this->shared->getDataMessageError(), ['error_detail' => $error->getMessage()]);
         }
