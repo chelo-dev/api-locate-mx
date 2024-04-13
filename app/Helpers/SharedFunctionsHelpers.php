@@ -52,42 +52,34 @@ class SharedFunctionsHelpers
 
     public static function getIpAddress()
     {
-        if (isset($_SERVER["HTTP_CLIENT_IP"]))
-            return $_SERVER["HTTP_CLIENT_IP"];
-        elseif (isset($_SERVER["HTTP_X_FORWARDED_FOR"]))
-            return $_SERVER["HTTP_X_FORWARDED_FOR"];
-        elseif (isset($_SERVER["HTTP_X_FORWARDED"]))
-            return $_SERVER["HTTP_X_FORWARDED"];
-        elseif (isset($_SERVER["HTTP_FORWARDED_FOR"]))
-            return $_SERVER["HTTP_FORWARDED_FOR"];
-        elseif (isset($_SERVER["HTTP_FORWARDED"]))
-            return $_SERVER["HTTP_FORWARDED"];
-        else
-            return $_SERVER["REMOTE_ADDR"];
+        $headers = ['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED'];
+        foreach ($headers as $header) {
+            if ($ip = $_SERVER[$header] ?? false) {
+                return trim(explode(',', $ip)[0]);
+            }
+        }
+        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 
     public static function logs()
     {
         $agent = new Agent();
 
-        $plataforma = $agent->platform(); // Ubuntu, Windows, OS X, ...
-        $navegador = $agent->browser(); // Chrome, IE, Safari, Firefox, ...
-
-        if ($agent->isRobot() == false) {
-            $logs_visitante = new Log(); // Modelo
+        if (!$agent->isRobot()) {
+            $plataforma = $agent->platform(); // Ubuntu, Windows, OS X, ...
+            $navegador = $agent->browser(); // Chrome, IE, Safari, Firefox, ...
+            $logs_visitante = new Log();
             $logs_visitante->uuid = Str::uuid();
             $logs_visitante->dispositivo = $agent->device();
             $logs_visitante->plataforma = $plataforma;
-            $logs_visitante->plataforma_version = $agent->version($plataforma);
-            $logs_visitante->equipo = $agent->isPhone();
+            $logs_visitante->plataforma_version = $agent->version($plataforma) ?? 'unknown';
+            $logs_visitante->equipo = $agent->isPhone() ? 1 : 0;
             $logs_visitante->navegador = $navegador;
-            $logs_visitante->navegador_version = $agent->version($navegador);
-            $logs_visitante->direccion_ip =  self::getIpAddress();
+            $logs_visitante->navegador_version = $agent->version($navegador) ?? 'unknown';
+            $logs_visitante->direccion_ip = self::getIpAddress();
             $logs_visitante->hostname = gethostname();
             $logs_visitante->save();
         }
-
-        return null;
     }
 
     public static function clearString($texto)
