@@ -43,4 +43,8 @@ Route::middleware('throttle:10,1')->prefix('mx/')->group(function () {
     Route::get('estados/{paginacion?}', [ApiController::class, 'estados'])
         ->name('estados')
         ->where('paginacion', '[0-9]+');
+
+    Route::get('download-geolocalizacion/{codigo_postal}', [ApiController::class, 'downloadGeolocalizazcion'])
+        ->name('downloadGeolocalizazcion')
+        ->where('codigo_postal', '[0-9]+');
 });

@@ -7,6 +7,7 @@ use App\Helpers\SharedFunctionsHelpers;
 use App\Models\Codigo_Postal_Municipio;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
 use App\Models\Codigo_Postal;
 use Illuminate\Http\Request;
@@ -165,4 +166,61 @@ class ApiController extends Controller
             return $this->shared->sendError($this->shared->getDataMessageError(), ['error_detail' => $error->getMessage()]);
         }
     }
+
+    public function downloadGeolocalizazcion($codigo_postal)
+    {
+        $validator = Validator::make(['codigo_postal' => $codigo_postal], [
+            'codigo_postal' => 'required|numeric|digits:5'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->shared->sendError($this->shared->getValidationMessageError(), ['error_detail' => $validator->messages()]);
+        }
+
+        try {
+            $codigoPostalMunicipio = Codigo_Postal_Municipio::with('municipio.estadoPais', 'codigoPostal', 'colonia.tipoComunidad')
+                ->whereHas('codigoPostal', function ($query) use ($codigo_postal) {
+                    $query->where('codigo', $codigo_postal);
+                })
+                ->first();
+
+            $data = [
+                'municipio' => [
+                    'nombre' => $codigoPostalMunicipio->municipio->nombre,
+                    'estado_pais' => [
+                        'nombre' => $codigoPostalMunicipio->municipio->estadoPais->nombre
+                    ]
+                ],
+                'codigo_postal' => [
+                    'codigo' => $codigoPostalMunicipio->codigoPostal->codigo
+                ],
+                'pais' => [
+                    'nombre' => 'MÉXICO',
+                    'abreviatura' => 'MX'
+                ],
+                'colonia' => [
+                    'nombre' => $codigoPostalMunicipio->colonia->nombre,
+                    'tipo_comunidad' => [
+                        'nombre' => $codigoPostalMunicipio->colonia->tipoComunidad->nombre
+                    ]
+                ]
+            ];
+            
+            // Registrar peticion
+            $this->shared->logs();
+
+            set_time_limit(0);
+
+            $pdf = Pdf::loadView('prints.geolocalizacion', compact('data'))
+            ->setPaper('a4')
+            ->setOption("isPhpEnabled", true)
+            ->setOption('margin-top', 5)
+            ->setOption('margin-bottom', 5);
+
+            return $pdf->download($this->shared->clearString('Informacion-detallada-' . '_' . date('d-m-Y', strtotime(now()))) . '.pdf');
+        } catch (Exception $error) {
+            return $this->shared->sendError($this->shared->messageDownloadPdf(), ['error_detail' => $error->getMessage()]);
+        }
+    }
+    
 }

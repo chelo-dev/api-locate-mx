@@ -142,4 +142,9 @@ class SharedFunctionsHelpers
     {
         return 'Un registro fue eliminado con éxito.';
     }
+
+    public static function messageDownloadPdf()
+    {
+        return 'Error obtener documento PDF.';
+    }
 }
