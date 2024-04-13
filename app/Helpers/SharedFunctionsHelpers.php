@@ -99,6 +99,15 @@ class SharedFunctionsHelpers
         return $texto;
     }
 
+    public static function normalize($string) {
+        $texto = Str::ascii($string);
+        $texto = trim($texto);
+        $texto = strtolower($texto);
+
+        return $texto;
+    }
+    
+
     public static function pathDocuments()
     {
         return 'documents/';
