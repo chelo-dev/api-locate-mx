@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Support\Facades\Validator;
 use App\Helpers\SharedFunctionsHelpers;
 use App\Models\Codigo_Postal_Municipio;
 use App\Http\Controllers\Controller;
@@ -23,6 +24,14 @@ class ApiController extends Controller
 
     public function ubicacionPorCodigoPostal($codigo_postal)
     {
+        $validator = Validator::make(['codigo_postal' => $codigo_postal], [
+            'codigo_postal' => 'required|numeric|digits:5'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->shared->sendError($this->shared->getValidationMessageError(), ['error_detail' => $validator->messages()]);
+        }
+
         try {
             $codigos_postales_municipios = Codigo_Postal_Municipio::with('municipio.estadoPais', 'codigoPostal', 'colonia.tipoComunidad')
                 ->whereHas('codigoPostal', function ($query) use ($codigo_postal) {
@@ -104,7 +113,7 @@ class ApiController extends Controller
 
             // Registrar peticion
             $this->shared->logs();
-            
+
             return $this->shared->sendResponse($estados, $this->shared->getDataMessage(), Response::HTTP_OK);
         } catch (Exception $error) {
             return $this->shared->sendError($this->shared->getDataMessageError(), ['error_detail' => $error->getMessage()]);

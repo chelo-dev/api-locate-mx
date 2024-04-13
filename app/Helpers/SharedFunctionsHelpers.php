@@ -114,6 +114,11 @@ class SharedFunctionsHelpers
         return 'Error obtener informacion';
     }
 
+    public static function getValidationMessageError()
+    {
+        return 'Peticion denegada por inexistencia del parametro';
+    }
+
     public static function messageRegisterSuccess()
     {
         return 'Se completó un registro con éxito.';
