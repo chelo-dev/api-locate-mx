@@ -6,6 +6,7 @@ use App\Models\Codigo_Postal_Municipio;
 use Illuminate\Database\Seeder;
 use App\Models\Tipo_Comunidad;
 use App\Models\Codigo_Postal;
+use Illuminate\Support\Str;
 use App\Models\Estado_Pais;
 use App\Models\Municipio;
 use App\Models\Colonia;
@@ -31,6 +32,7 @@ class CodigosPostalSeeder extends Seeder
         while (($data = fgetcsv($archivo,1000,";")) !== false) {
             if ($data[0] != 'NOMBRE') {
                 $estado = new Estado_Pais;
+                $estado->uuid = Str::uuid();
                 $estado->nombre = $data[0];
                 $estado->save();
             }
@@ -46,16 +48,19 @@ class CodigosPostalSeeder extends Seeder
         while (($data = fgetcsv($archivo,1000,";")) !== false) {
             if ($data[0] != 'NOMBRE') {
                 $tipo_colonia = new Tipo_Comunidad;
+                $tipo_colonia->uuid = Str::uuid();
                 $tipo_colonia->nombre = $data[0];
                 $tipo_colonia->save();
             }
         }
 
         $tipo_colonia = new Tipo_Comunidad;
+        $tipo_colonia->uuid = Str::uuid();
         $tipo_colonia->nombre = 'DESCONOCIDO';
         $tipo_colonia->save();
 
         $tipo_colonia = new Tipo_Comunidad;
+        $tipo_colonia->uuid = Str::uuid();
         $tipo_colonia->nombre = 'RESERVA TERRITORIAL';
         $tipo_colonia->save();
 
@@ -69,12 +74,14 @@ class CodigosPostalSeeder extends Seeder
         while (($data = fgetcsv($archivo,1000,";")) !== false) {
             if ($data[0] != 'CODIGO') {
                 $codigo_postal = new Codigo_Postal;
+                $codigo_postal->uuid = Str::uuid();
                 $codigo_postal->codigo = $data[0];
                 $codigo_postal->save();
             }
         }
 
         $codigo_postal = new Codigo_Postal;
+        $codigo_postal->uuid = Str::uuid();
         $codigo_postal->codigo = '00000';
         $codigo_postal->save();
 
@@ -88,6 +95,7 @@ class CodigosPostalSeeder extends Seeder
         while (($data = fgetcsv($archivo,1000,";")) !== false) {
             if ($data[0] != 'NOMBRE') {
                 $municipio = new Municipio;
+                $municipio->uuid = Str::uuid();
                 $municipio->nombre = $data[0];
                 $municipio->estados_paises_id = $data[1];
                 $municipio->save();
@@ -104,6 +112,7 @@ class CodigosPostalSeeder extends Seeder
         while (($data = fgetcsv($archivo,1000,";")) !== false) {
             if ($data[0] != 'MUNICIPIOS ID') {
                 $codigo_postal_municipio = new Codigo_Postal_Municipio;
+                $codigo_postal_municipio->uuid = Str::uuid();
                 $codigo_postal_municipio->municipios_id = $data[0];
                 $codigo_postal_municipio->codigos_postales_id = $data[1];
                 $codigo_postal_municipio->save();
@@ -111,6 +120,7 @@ class CodigosPostalSeeder extends Seeder
         }
 
         $codigo_postal_municipio = new Codigo_Postal_Municipio;
+        $codigo_postal_municipio->uuid = Str::uuid();
         $codigo_postal_municipio->municipios_id = 2471;
         $codigo_postal_municipio->codigos_postales_id = 31795;
         $codigo_postal_municipio->save();
@@ -125,6 +135,7 @@ class CodigosPostalSeeder extends Seeder
         while (($data = fgetcsv($archivo,1000,";")) !== false) {
             if ($data[0] != 'NOMBRE') {
                 $colonia = new Colonia;
+                $colonia->uuid = Str::uuid();
                 $colonia->nombre = $data[0];
                 $colonia->tipos_comunidades_id = $data[1];
                 $colonia->codigos_postales_municipios_id = $data[2];
@@ -136,6 +147,7 @@ class CodigosPostalSeeder extends Seeder
         while (($data = fgetcsv($archivo,1000,";")) !== false) {
             if ($data[0] != 'NOMBRE') {
                 $colonia = new Colonia;
+                $colonia->uuid = Str::uuid();
                 $colonia->nombre = $data[0];
                 $colonia->tipos_comunidades_id = $data[1];
                 $colonia->codigos_postales_municipios_id = $data[2];
@@ -147,6 +159,7 @@ class CodigosPostalSeeder extends Seeder
         while (($data = fgetcsv($archivo,1000,";")) !== false) {
             if ($data[0] != 'NOMBRE') {
                 $colonia = new Colonia;
+                $colonia->uuid = Str::uuid();
                 $colonia->nombre = $data[0];
                 $colonia->tipos_comunidades_id = $data[1];
                 $colonia->codigos_postales_municipios_id = $data[2];
@@ -158,6 +171,7 @@ class CodigosPostalSeeder extends Seeder
         while (($data = fgetcsv($archivo,1000,";")) !== false) {
             if ($data[0] != 'NOMBRE') {
                 $colonia = new Colonia;
+                $colonia->uuid = Str::uuid();
                 $colonia->nombre = $data[0];
                 $colonia->tipos_comunidades_id = $data[1];
                 $colonia->codigos_postales_municipios_id = $data[2];
@@ -166,6 +180,7 @@ class CodigosPostalSeeder extends Seeder
         }
 
         $colonia = new Colonia;
+        $colonia->uuid = Str::uuid();
         $colonia->nombre = 'DESCONOCIDO';
         $colonia->tipos_comunidades_id = 31;
         $colonia->codigos_postales_municipios_id = 31795;

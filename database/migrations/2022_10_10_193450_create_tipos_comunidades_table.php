@@ -15,6 +15,7 @@ class CreateTiposComunidadesTable extends Migration
     {
         Schema::create('tipos_comunidades', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->string('nombre')->unique();
             $table->timestamps();
         });

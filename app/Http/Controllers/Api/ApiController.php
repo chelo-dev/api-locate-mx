@@ -29,6 +29,9 @@ class ApiController extends Controller
                     $query->where('codigo', $codigo_postal);
                 })
                 ->firstOrFail();
+            
+            // Registrar peticion
+            $this->shared->logs();
 
             return $this->shared->sendResponse($codigos_postales_municipios, $this->shared->getDataMessage(), Response::HTTP_OK);
         } catch (Exception $error) {
@@ -43,6 +46,9 @@ class ApiController extends Controller
                 ->orderBy('id', 'ASC')
                 ->paginate($paginacion);
 
+            // Registrar peticion
+            $this->shared->logs();
+
             return $this->shared->sendResponse($codigos_postales, $this->shared->getDataMessage(), Response::HTTP_OK);
         } catch (Exception $error) {
             return $this->shared->sendError($this->shared->getDataMessageError(), ['error_detail' => $error->getMessage()]);
@@ -53,6 +59,9 @@ class ApiController extends Controller
     {
         try {
             $colonia = Colonia::with('tipoComunidad')->where('nombre', $colonia)->firstOrFail();
+
+            // Registrar peticion
+            $this->shared->logs();
 
             return $this->shared->sendResponse($colonia, $this->shared->getDataMessage(), Response::HTTP_OK);
         } catch (Exception $error) {
@@ -65,6 +74,9 @@ class ApiController extends Controller
         try {
             $colonias = Colonia::orderBy('id', 'ASC')->paginate($paginacion);
 
+            // Registrar peticion
+            $this->shared->logs();
+
             return $this->shared->sendResponse($colonias, $this->shared->getDataMessage(), Response::HTTP_OK);
         } catch (Exception $error) {
             return $this->shared->sendError($this->shared->getDataMessageError(), ['error_detail' => $error->getMessage()]);
@@ -74,11 +86,10 @@ class ApiController extends Controller
     public function estado($estado)
     {
         try {
-            $estado = strtolower($estado);
+            $estadoEncontrado = Estado_Pais::where("nombre", trim($estado))->firstOrFail();
 
-            $estadoEncontrado = Estado_Pais::whereRaw("LOWER(nombre) LIKE ?", ['%' . $estado . '%'])
-                ->orWhereRaw("MATCH(nombre) AGAINST(? IN NATURAL LANGUAGE MODE)", [$estado])
-                ->firstOrFail(['id', 'nombre']);
+            // Registrar peticion
+            $this->shared->logs();
 
             return $this->shared->sendResponse($estadoEncontrado, $this->shared->getDataMessage(), Response::HTTP_OK);
         } catch (Exception $error) {
@@ -91,6 +102,9 @@ class ApiController extends Controller
         try {
             $estados = Estado_Pais::orderBy('id', 'ASC')->paginate($paginacion);
 
+            // Registrar peticion
+            $this->shared->logs();
+            
             return $this->shared->sendResponse($estados, $this->shared->getDataMessage(), Response::HTTP_OK);
         } catch (Exception $error) {
             return $this->shared->sendError($this->shared->getDataMessageError(), ['error_detail' => $error->getMessage()]);

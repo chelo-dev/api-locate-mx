@@ -15,6 +15,7 @@ class CreateCodigosPostalesMunicipiosTable extends Migration
     {
         Schema::create('codigos_postales_municipios', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->unsignedBigInteger('municipios_id');
             $table->unsignedBigInteger('codigos_postales_id');
             

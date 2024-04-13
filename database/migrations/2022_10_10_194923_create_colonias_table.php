@@ -15,6 +15,7 @@ class CreateColoniasTable extends Migration
     {
         Schema::create('colonias', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->string('nombre');
             $table->unsignedBigInteger('tipos_comunidades_id');
             $table->unsignedBigInteger('codigos_postales_municipios_id');

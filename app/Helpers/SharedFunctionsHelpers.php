@@ -4,7 +4,9 @@ namespace App\Helpers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Response;
+use Jenssegers\Agent\Agent;
 use Illuminate\Support\Str;
+use App\Models\Log;
 
 class SharedFunctionsHelpers
 {
@@ -46,6 +48,46 @@ class SharedFunctionsHelpers
             $response['data'] = $errorMessages;
 
         return response()->json($response, $code);
+    }
+
+    public static function getIpAddress()
+    {
+        if (isset($_SERVER["HTTP_CLIENT_IP"]))
+            return $_SERVER["HTTP_CLIENT_IP"];
+        elseif (isset($_SERVER["HTTP_X_FORWARDED_FOR"]))
+            return $_SERVER["HTTP_X_FORWARDED_FOR"];
+        elseif (isset($_SERVER["HTTP_X_FORWARDED"]))
+            return $_SERVER["HTTP_X_FORWARDED"];
+        elseif (isset($_SERVER["HTTP_FORWARDED_FOR"]))
+            return $_SERVER["HTTP_FORWARDED_FOR"];
+        elseif (isset($_SERVER["HTTP_FORWARDED"]))
+            return $_SERVER["HTTP_FORWARDED"];
+        else
+            return $_SERVER["REMOTE_ADDR"];
+    }
+
+    public static function logs()
+    {
+        $agent = new Agent();
+
+        $plataforma = $agent->platform(); // Ubuntu, Windows, OS X, ...
+        $navegador = $agent->browser(); // Chrome, IE, Safari, Firefox, ...
+
+        if ($agent->isRobot() == false) {
+            $logs_visitante = new Log(); // Modelo
+            $logs_visitante->uuid = Str::uuid();
+            $logs_visitante->dispositivo = $agent->device();
+            $logs_visitante->plataforma = $plataforma;
+            $logs_visitante->plataforma_version = $agent->version($plataforma);
+            $logs_visitante->equipo = $agent->isPhone();
+            $logs_visitante->navegador = $navegador;
+            $logs_visitante->navegador_version = $agent->version($navegador);
+            $logs_visitante->direccion_ip =  self::getIpAddress();
+            $logs_visitante->hostname = gethostname();
+            $logs_visitante->save();
+        }
+
+        return null;
     }
 
     public static function clearString($texto)

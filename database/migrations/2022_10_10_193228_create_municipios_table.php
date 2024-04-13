@@ -15,6 +15,7 @@ class CreateMunicipiosTable extends Migration
     {
         Schema::create('municipios', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->string('nombre');
             $table->unsignedBigInteger('estados_paises_id');
 

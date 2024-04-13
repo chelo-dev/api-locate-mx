@@ -15,6 +15,7 @@ class CreateEstadosPaisesTable extends Migration
     {
         Schema::create('estados_paises', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->string('nombre')->unique();
             $table->timestamps();
         });
