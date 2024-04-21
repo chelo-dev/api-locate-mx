@@ -1,5 +1,4 @@
-
-![Logo](https://github.com/chelitodelgado/lotedeimagenes/blob/main/Side%20project.png?raw=true](https://github.com/chelo-dev/imagenes-para-compartir/blob/main/marca_agua.png)
+![Logo](https://github.com/chelitodelgado/lotedeimagenes/blob/main/Side%20project.png?raw=true)
 
 
 # API Codigos Postales MX
