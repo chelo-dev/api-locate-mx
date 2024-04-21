@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\Api\GetGeolocalitationHelper;
 use Illuminate\Support\Facades\Validator;
 use App\Helpers\SharedFunctionsHelpers;
 use App\Models\Codigo_Postal_Municipio;
@@ -17,53 +18,30 @@ use Exception;
 
 class ApiController extends Controller
 {
-    protected $shared;
+    protected $shared, $geolocation;
 
-    public function __construct(SharedFunctionsHelpers $shared)
+    public function __construct(SharedFunctionsHelpers $shared, GetGeolocalitationHelper $geolocation)
     {
         $this->shared = $shared;
+        $this->geolocation = $geolocation;
     }
 
-    public function ubicacionPorCodigoPostal($codigo_postal)
+    public function ubicacionPorCodigoPostal(Request $request)
     {
-        $validator = Validator::make(['codigo_postal' => $codigo_postal], [
-            'codigo_postal' => 'required|numeric|digits:5'
+        $validator = Validator::make($request->all(), [
+            'codigo_postal' => 'required|numeric|digits_between:4,5'
         ]);
 
         if ($validator->fails()) {
             return $this->shared->sendError($this->shared->getValidationMessageError(), ['error_detail' => $validator->messages()]);
         }
 
-        try {
-            $codigoPostalMunicipio = Codigo_Postal_Municipio::with('municipio.estadoPais', 'codigoPostal', 'colonia.tipoComunidad')
-                ->whereHas('codigoPostal', function ($query) use ($codigo_postal) {
-                    $query->where('codigo', $codigo_postal);
-                })
-                ->first();
+        $codigo_postal = ltrim($request->input('codigo_postal'), '0');
 
-            $data = [
-                'municipio' => [
-                    'nombre' => $codigoPostalMunicipio->municipio->nombre,
-                    'estado_pais' => [
-                        'nombre' => $codigoPostalMunicipio->municipio->estadoPais->nombre
-                    ]
-                ],
-                'codigo_postal' => [
-                    'codigo' => $codigoPostalMunicipio->codigoPostal->codigo
-                ],
-                'pais' => [
-                    'nombre' => 'MÉXICO',
-                    'abreviatura' => 'MX'
-                ],
-                'colonia' => [
-                    'nombre' => $codigoPostalMunicipio->colonia->nombre,
-                    'tipo_comunidad' => [
-                        'nombre' => $codigoPostalMunicipio->colonia->tipoComunidad->nombre
-                    ]
-                ]
-            ];
+        try {
+            $data = $this->geolocation->searchGeolocation($codigo_postal);
             
-            // Registrar peticion
+            // Registrar informacion del solicitante.
             $this->shared->logs();
 
             return $this->shared->sendResponse($data, $this->shared->getDataMessage(), Response::HTTP_OK);
@@ -88,9 +66,9 @@ class ApiController extends Controller
         }
     }
 
-    public function colonia($colonia)
+    public function colonia(Request $request)
     {
-        $validator = Validator::make(['nombre' => $colonia], [
+        $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|min:3|max:255'
         ]);
 
@@ -98,17 +76,10 @@ class ApiController extends Controller
             return $this->shared->sendError($this->shared->getValidationMessageError(), ['error_detail' => $validator->messages()]);
         }
 
-        try {
-            $coloniaResult = Colonia::with('tipoComunidad')
-                ->where(DB::raw("LOWER(nombre)"), '=', $this->shared->normalize($colonia))
-                ->first();
+        $nombre = $this->shared->clearString($request->input('nombre'));
 
-            $data = [
-                'nombre' => $coloniaResult->nombre,
-                'tipo_comunidad' => [
-                    'nombre' => $coloniaResult->tipoComunidad->nombre
-                ]
-            ];
+        try {
+            $data = $this->geolocation->searchColonia($nombre);
 
             // Registrar peticion
             $this->shared->logs();
@@ -167,60 +138,35 @@ class ApiController extends Controller
         }
     }
 
-    public function downloadGeolocalizazcion($codigo_postal)
+    public function downloadGeolocalizazcion(Request $request)
     {
-        $validator = Validator::make(['codigo_postal' => $codigo_postal], [
-            'codigo_postal' => 'required|numeric|digits:5'
+        $validator = Validator::make($request->all(), [
+            'codigo_postal' => 'required|numeric|digits_between:4,5'
         ]);
 
         if ($validator->fails()) {
             return $this->shared->sendError($this->shared->getValidationMessageError(), ['error_detail' => $validator->messages()]);
         }
 
-        try {
-            $codigoPostalMunicipio = Codigo_Postal_Municipio::with('municipio.estadoPais', 'codigoPostal', 'colonia.tipoComunidad')
-                ->whereHas('codigoPostal', function ($query) use ($codigo_postal) {
-                    $query->where('codigo', $codigo_postal);
-                })
-                ->first();
+        $codigo_postal = ltrim($request->input('codigo_postal'), '0');
 
-            $data = [
-                'municipio' => [
-                    'nombre' => $codigoPostalMunicipio->municipio->nombre,
-                    'estado_pais' => [
-                        'nombre' => $codigoPostalMunicipio->municipio->estadoPais->nombre
-                    ]
-                ],
-                'codigo_postal' => [
-                    'codigo' => $codigoPostalMunicipio->codigoPostal->codigo
-                ],
-                'pais' => [
-                    'nombre' => 'MÉXICO',
-                    'abreviatura' => 'MX'
-                ],
-                'colonia' => [
-                    'nombre' => $codigoPostalMunicipio->colonia->nombre,
-                    'tipo_comunidad' => [
-                        'nombre' => $codigoPostalMunicipio->colonia->tipoComunidad->nombre
-                    ]
-                ]
-            ];
-            
+        try {
+            $data = $this->geolocation->generatePdf($codigo_postal);
+
             // Registrar peticion
             $this->shared->logs();
 
             set_time_limit(0);
 
             $pdf = Pdf::loadView('prints.geolocalizacion', compact('data'))
-            ->setPaper('a4')
-            ->setOption("isPhpEnabled", true)
-            ->setOption('margin-top', 5)
-            ->setOption('margin-bottom', 5);
+                ->setPaper('a4')
+                ->setOption("isPhpEnabled", true)
+                ->setOption('margin-top', 5)
+                ->setOption('margin-bottom', 5);
 
             return $pdf->download($this->shared->clearString('Informacion-detallada-' . '_' . date('d-m-Y', strtotime(now()))) . '.pdf');
         } catch (Exception $error) {
             return $this->shared->sendError($this->shared->messageDownloadPdf(), ['error_detail' => $error->getMessage()]);
         }
     }
-    
 }

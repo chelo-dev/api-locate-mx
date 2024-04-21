@@ -2,7 +2,6 @@
 
 namespace App\Helpers;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Response;
 use Jenssegers\Agent\Agent;
 use Illuminate\Support\Str;

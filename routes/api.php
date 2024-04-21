@@ -23,15 +23,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Limitación de Frecuencia (Rate Limiting): a 10 peticiones por minuto
 Route::middleware('throttle:10,1')->prefix('mx/')->group(function () {
-    Route::get('ubicacion-por-codigo-postal/{codigo_postal}', [ApiController::class, 'ubicacionPorCodigoPostal'])
-        ->name('obtener_codigos_postales_municipios')
-        ->where('codigo_postal', '[0-9]+');
+    Route::post('ubicacion-por-codigo-postal', [ApiController::class, 'ubicacionPorCodigoPostal'])
+        ->name('obtener_codigos_postales_municipios');
 
     Route::get('codigos-postales/{paginacion?}', [ApiController::class, 'codigosPostales'])
-        ->name('codigos_postales')
-        ->where('paginacion', '[0-9]+');
+        ->name('codigos_postales');
 
-    Route::get('colonia/{colonia}', [ApiController::class, 'colonia'])
+    Route::post('colonia', [ApiController::class, 'colonia'])
         ->name('colonia');
 
     Route::get('colonias/{paginacion?}', [ApiController::class, 'colonias'])
@@ -44,7 +42,6 @@ Route::middleware('throttle:10,1')->prefix('mx/')->group(function () {
         ->name('estados')
         ->where('paginacion', '[0-9]+');
 
-    Route::get('download-geolocalizacion/{codigo_postal}', [ApiController::class, 'downloadGeolocalizazcion'])
-        ->name('downloadGeolocalizazcion')
-        ->where('codigo_postal', '[0-9]+');
+    Route::post('download-geolocalizacion', [ApiController::class, 'downloadGeolocalizazcion'])
+        ->name('downloadGeolocalizazcion');
 });

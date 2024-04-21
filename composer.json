@@ -29,7 +29,8 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "app/Helpers/SharedFunctionsHelpers.php"
+            "app/Helpers/SharedFunctionsHelpers.php",
+            "app/Helpers/Api/GetGeolocalitationHelper.php"
         ]
     },
     "autoload-dev": {
