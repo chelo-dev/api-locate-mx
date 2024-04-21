@@ -1,6 +1,5 @@
 ![Logo](https://github.com/chelitodelgado/lotedeimagenes/blob/main/Side%20project.png?raw=true)
 
-
 # API Codigos Postales MX
 
 ## Descripción
@@ -14,14 +13,14 @@ La API se puede utilizar para acceder a datos de ubicación geográfica de diver
 #### Obtener Ubicación por Código Postal
 
 ```http
-  GET http://127.0.0.1:8000/api/ubicacion-por-codigo-postal/62400
+  POST http://127.0.0.1:8000/api/ubicacion-por-codigo-postal
 ```
 
 | Parametro | Tipo     | Descripción                |
 | :-------- | :------- | :------------------------- |
 | `codigo postal` | `numerico` | **Requerido**. Este endpoint le permite obtener información detallada sobre una ubicación específica a través de un código postal. La respuesta incluye datos sobre el municipio, estado y colonia asociados al código postal proporcionado. |
 
-#### Ejemplo: (62400)
+#### Ejemplo: (03590)
 
 Este valor corresponde al código postal
 
@@ -47,7 +46,7 @@ Este valor corresponde a la cantidad de registros paginados.
 
 | Parametro | Tipo     | Descripción                       |
 | :-------- | :------- | :-------------------------------- |
-| `estado`      | `string` | **Requerido**. Con este endpoint, puede obtener una lista de colonias disponibles en México. La respuesta incluye información sobre el nombre y el tipo de comunidad de cada colonia. |
+| `paginacion`      | `int` | **Requerido**. Con este endpoint, puede obtener una lista de colonias disponibles en México. La respuesta incluye información sobre el nombre y el tipo de comunidad de cada colonia. |
 
 #### Ejemplo: Numero de paginas a mostrar: (10, 20, 30, 50, ...)
 
@@ -56,12 +55,12 @@ Este valor corresponde a la cantidad de registros paginados.
 #### Obtener Colonia por Nombre
 
 ```http
-  GET http://127.0.0.1:8000/api/colonia/el vergel
+  POST http://127.0.0.1:8000/api/colonia
 ```
 
 | Parametro | Tipo     | Descripción                       |
 | :-------- | :------- | :-------------------------------- |
-| `colonia`      | `string` | **Requerido**. Este endpoint permite obtener información sobre una colonia específica proporcionando su nombre. La respuesta incluye datos sobre el tipo de comunidad y otros detalles relevantes. |
+| `nombre`      | `string` | **Requerido**. Este endpoint permite obtener información sobre una colonia específica proporcionando su nombre. La respuesta incluye datos sobre el tipo de comunidad y otros detalles relevantes. |
 
 #### Ejemplo: el vergel
 
@@ -85,6 +84,33 @@ Escribe el nombre del estado para obtener su información.
 ## Ejemplo de Respuesta
 
 Cada solicitud a la API devuelve una respuesta en formato JSON, que contiene datos geográficos precisos relacionados con el código postal, estado, ciudad, localidad y municipio consultados.
+```
+{
+	"success": true,
+	"data": {
+		"municipio": {
+			"nombre": "BENITO JUÁREZ",
+			"estado_pais": {
+				"nombre": "CIUDAD DE MÉXICO "
+			}
+		},
+		"codigo_postal": {
+			"codigo": "3590"
+		},
+		"pais": {
+			"nombre": "MÉXICO",
+			"abreviatura": "MX"
+		},
+		"colonia": {
+			"nombre": "ERMITA",
+			"tipo_comunidad": {
+				"nombre": "COLONIA"
+			}
+		}
+	},
+	"message": "Datos recuperados con éxito"
+}
+```
 
 ## Headers de Solicitud
 Para interactuar con la API, asegúrese de establecer adecuadamente los siguientes headers en sus solicitudes:
